@@ -12,18 +12,6 @@ const rotationSun = keyframes`
   }
 `;
 
-const floatingCloud = keyframes`
-  0%{
-    transform: translateY(0);
-  }
-  50%{
-    transform: translateY(1px);
-  }
-  100%{
-    transform: translateY(0);
-  }
-`;
-
 const LoadingContainer = styled.div`
   width: 100%;
   height: 100vh;
