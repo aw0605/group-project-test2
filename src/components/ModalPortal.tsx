@@ -13,9 +13,7 @@ const ModalPortal: FC<ModalPortalProps> = ({ children, onClose }) => {
 
   return ReactDOM.createPortal(
     <ModalBg onClick={onClose}>
-      <ModalContent onClick={(e: MouseEvent) => e.stopPropagation()}>
-        {children}
-      </ModalContent>
+      <div onClick={(e: MouseEvent) => e.stopPropagation()}>{children}</div>
     </ModalBg>,
     modalRoot
   );
@@ -34,11 +32,4 @@ const ModalBg = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`;
-
-const ModalContent = styled.div`
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 5px;
-  position: relative;
 `;

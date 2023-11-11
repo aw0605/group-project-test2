@@ -1,25 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { FC } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import styled from "styled-components";
-import axios from "axios";
 
-const FeedSlider = () => {
-  const [images, setImages] = useState<string[]>([]);
+interface ImgsProps {
+  imgs: string[];
+}
 
-  useEffect(() => {
-    axios
-      .get("/api/slide")
-      .then((response) => {
-        const imageUrls: string[] = Object.values(response.data) as string[];
-        setImages(imageUrls);
-      })
-      .catch((error) => console.error(error));
-  }, []);
-
+const FeedSlider: FC<ImgsProps> = ({ imgs }) => {
   return (
     <>
       <StyledSwiper
@@ -29,9 +20,9 @@ const FeedSlider = () => {
         navigation={true}
         modules={[Pagination, Navigation]}
       >
-        {images?.map((imageUrl, index) => (
+        {imgs?.map((img, index) => (
           <SwiperSlide key={index}>
-            <img src={imageUrl} alt={`slide ${index + 1}`} />
+            <img src={img} alt={`slide ${index + 1}`} />
           </SwiperSlide>
         ))}
       </StyledSwiper>

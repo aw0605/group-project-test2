@@ -1,10 +1,11 @@
 import React, { FC, useEffect, useState } from "react";
 import axios from "axios";
 import FeedItem from "./FeedItem";
-import { Post } from "../../types/feedType";
+import { Feed } from "../../types/feedType";
 
 const FeedList: FC = () => {
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<Feed[]>([]);
+
   useEffect(() => {
     axios
       .get("/api/feed/posts")
@@ -14,6 +15,7 @@ const FeedList: FC = () => {
       })
       .catch((error) => console.error(error));
   }, []);
+
   return (
     <div>
       {posts.map((post, index) => (

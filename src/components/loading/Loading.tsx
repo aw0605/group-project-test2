@@ -1,7 +1,7 @@
 import React from "react";
 import styled, { keyframes } from "styled-components";
-import SunSVG from "../assets/sun.svg";
-import CloudSVG from "../assets/cloud.svg";
+import SunSVG from "../../assets/img/loading/sun.svg";
+import CloudSVG from "../../assets/img/loading/cloud.svg";
 
 const rotationSun = keyframes`
   from {

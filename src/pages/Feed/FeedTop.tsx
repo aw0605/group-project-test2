@@ -68,7 +68,7 @@ const UserContainer = styled.div`
 const SecondTop = styled.div`
   display: flex;
   align-items: center;
-  margin: 0 0 5px;
+  margin: 5px 0 10px;
   span {
     font-size: 14px;
   }

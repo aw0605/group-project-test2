@@ -1,29 +1,22 @@
-export interface FeedTop {
+export interface User {
+  userImg: string;
+  userId: string;
+}
+
+export interface Heart {
+  PostId: string;
+  userList: Array<User>;
+}
+
+export interface Feed {
   userImg: string;
   userId: string;
   date: string;
   location: string;
   temperature: number;
-}
-
-export interface Hearts {
-  number: number;
-  lists: Array<{
-    userImg: string;
-    userId: string;
-  }>;
-}
-
-export interface Post {
-  userImg: string;
-  userId: string;
-  date: string;
-  location: string;
-  temperature: number;
-  imgs: {
-    [key: string]: string;
-  };
-  hearts: Hearts;
+  postId: string;
+  imgs: string[];
+  heartCount: number;
   text: string;
   tags: string[];
 }
