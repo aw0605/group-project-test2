@@ -1,5 +1,6 @@
 import React, { FC } from "react";
 import styled from "styled-components";
+import { formatDate } from "../../utils/dateUtil";
 
 interface FeedTopProps {
   userId: string;
@@ -23,7 +24,7 @@ const FeedTop: FC<FeedTopProps> = ({
           <img src={userImg} alt={`${userId} 프로필 이미지`} />
           <p>{userId}</p>
         </UserContainer>
-        <p>{date}</p>
+        <p>{formatDate(date)}</p>
       </FirstTop>
       <SecondTop>
         <span>{location}</span>
@@ -61,14 +62,14 @@ const UserContainer = styled.div`
   ::after {
     content: "•";
     color: #6d6d6d;
-    margin: 0 5px;
+    margin: 0 7px;
   }
 `;
 
 const SecondTop = styled.div`
   display: flex;
   align-items: center;
-  margin: 5px 0 10px;
+  margin: 7px 0 10px;
   span {
     font-size: 14px;
   }

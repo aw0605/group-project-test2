@@ -5,12 +5,19 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import styled from "styled-components";
+import VideoCont from "./VideoCont";
 
 interface ImgsProps {
   imgs: string[];
 }
 
 const FeedSlider: FC<ImgsProps> = ({ imgs }) => {
+  const isVideo = (url: string) => {
+    return url.includes(
+      ".mp4" || ".avi" || ".avi" || ".wmv" || ".asf" || ".mkv" || ".mov"
+    );
+  };
+
   return (
     <>
       <StyledSwiper
@@ -22,7 +29,11 @@ const FeedSlider: FC<ImgsProps> = ({ imgs }) => {
       >
         {imgs?.map((img, index) => (
           <SwiperSlide key={index}>
-            <img src={img} alt={`slide ${index + 1}`} />
+            {isVideo(img) ? (
+              <VideoCont src={img} />
+            ) : (
+              <img src={img} alt={`slide ${index + 1}`} />
+            )}
           </SwiperSlide>
         ))}
       </StyledSwiper>
@@ -41,7 +52,6 @@ const StyledSwiper = styled(Swiper)`
     height: 100%;
     object-fit: cover;
   }
-  background: yellow;
   .swiper-pagination-bullet {
     width: 8px;
     height: 8px;

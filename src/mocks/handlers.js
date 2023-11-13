@@ -1,12 +1,19 @@
 import { http, HttpResponse } from "msw";
 
+// 현재 로그인된 사용자 mockdata
+const currentUser = {
+  userId: "jtmmg",
+  userImg:
+    "https://cdn.pixabay.com/photo/2018/10/01/09/21/pets-3715733_640.jpg",
+};
+
 // 피드 mockdata
 const feeds = [
   {
     userImg:
       "https://cdn.pixabay.com/photo/2022/02/04/12/49/woman-6992691_640.jpg",
     userId: "abc_123",
-    date: "2023-10-27 18:35:22",
+    date: "2023-11-11 22:19:12",
     location: "서울시 강남구",
     temperature: 21,
     postId: "1",
@@ -23,7 +30,7 @@ const feeds = [
     userImg:
       "https://cdn.pixabay.com/photo/2023/07/11/00/02/mango-smoothie-8119280_640.jpg",
     userId: "aaa_111",
-    date: "2023-10-27 18:45:29",
+    date: "2023-11-06 18:45:29",
     location: "부산 해운구",
     temperature: 22,
     postId: "2",
@@ -33,7 +40,7 @@ const feeds = [
     ],
     heartCount: 4,
     text: "2박 3일 부산 여행! 23.10.24 - 23.10.26",
-    tags: ["#여행", "#부산", "#해운대", "바다"],
+    tags: ["#여행", "#부산", "#해운대", "#바다"],
   },
   {
     userImg:
@@ -81,7 +88,7 @@ const feeds = [
     ],
     heartCount: 5,
     text: "경주로 놀러갔다. 초등학생 때 이후로 처음 왔다. ㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎ 한복도 입었다.",
-    tags: ["#여행", "#경주", "#석굴암", "불국사", "한복"],
+    tags: ["#여행", "#경주", "#석굴암", "#불국사", "#한복"],
   },
   {
     userImg:
@@ -92,7 +99,7 @@ const feeds = [
     temperature: 30,
     postId: "6",
     imgs: [
-      "https://cdn.pixabay.com/vimeo/351374270/25639.mp4?width=1280&hash=6e8d99c1bba0ad72cec88dd411e0cc241536e4bc",
+      "https://player.vimeo.com/external/449961163.sd.mp4?s=ae3eb4725cd2f17affdf28f2f676391a80eadf3b&profile_id=165&oauth2_token_id=57447761",
       "https://cdn.pixabay.com/photo/2023/07/06/15/07/swim-8110683_640.jpg",
     ],
     heartCount: 5,
@@ -103,7 +110,7 @@ const feeds = [
     userImg:
       "https://cdn.pixabay.com/photo/2023/09/26/06/45/bride-8276620_640.jpg",
     userId: "gsa_124_222",
-    date: "2023-10-23 23:35:39",
+    date: "2023-10-22 23:35:39",
     location: "서울시 마포구",
     temperature: 30,
     postId: "7",
@@ -242,7 +249,7 @@ const feeds = [
     ],
     heartCount: 5,
     text: "경주로 놀러갔다. 초등학생 때 이후로 처음 왔다. ㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎ 한복도 입었다.",
-    tags: ["#여행", "#경주", "#석굴암", "불국사", "한복"],
+    tags: ["#여행", "#경주", "#석굴암", "#불국사", "#한복"],
   },
   {
     userImg:
@@ -403,7 +410,7 @@ const feeds = [
     ],
     heartCount: 5,
     text: "경주로 놀러갔다. 초등학생 때 이후로 처음 왔다. ㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎ 한복도 입었다.",
-    tags: ["#여행", "#경주", "#석굴암", "불국사", "한복"],
+    tags: ["#여행", "#경주", "#석굴암", "#불국사", "#한복"],
   },
   {
     userImg:
@@ -1072,9 +1079,8 @@ export const handlers = [
   }),
 
   // 좋아요 등록 POST
-  http.post("/api/feed/posts/:postId/hearts", ({ params, request }) => {
+  http.post("/api/feed/posts/:postId/hearts", ({ params }) => {
     const { postId } = params;
-    const user = request.body;
 
     const feed = feeds.find((f) => f.postId === postId);
     if (!feed) {
@@ -1087,20 +1093,29 @@ export const handlers = [
       heartsEntry = { postId, userList: [] };
       heartsData.push(heartsEntry);
     }
-    heartsEntry.userList.push({ userImg: user.userImg, userId: user.userId });
 
-    return HttpResponse.json(heartsEntry, { status: 201 });
+    // 현재 로그인된 사용자를 userList에 추가
+    heartsEntry.userList.push({
+      userImg: currentUser.userImg,
+      userId: currentUser.userId,
+    });
+
+    // return HttpResponse.json(heartsEntry, { status: 201 });
+    return HttpResponse.json({
+      heartCount: feed.heartCount,
+      userList: heartsEntry.userList,
+    });
   }),
 
   // 좋아요 취소 DELETE
-  http.delete("/api/feed/posts/:postId/hearts", ({ params, request }) => {
+  http.delete("/api/feed/posts/:postId/hearts", ({ params }) => {
     const { postId } = params;
-    const user = request.body;
 
     const feed = feeds.find((f) => f.postId === postId);
     if (!feed) {
       return HttpResponse.error("Post not found", { status: 404 });
     }
+
     if (feed.heartCount > 0) {
       feed.heartCount -= 1;
     }
@@ -1108,10 +1123,28 @@ export const handlers = [
     const heartsEntry = heartsData.find((entry) => entry.postId === postId);
     if (heartsEntry) {
       heartsEntry.userList = heartsEntry.userList.filter(
-        (u) => u.userId !== user.userId
+        (u) => u.userId !== currentUser.userId
       );
     }
 
-    return HttpResponse.json(heartsEntry);
+    // return HttpResponse.json(heartsEntry);
+    return HttpResponse.json({
+      heartCount: feed.heartCount,
+      userList: heartsEntry.userList,
+    });
+  }),
+
+  // 특정 유저의 피드 조회 GET
+  http.get("/api/feed/posts/:userId", ({ params }) => {
+    const { userId } = params;
+    const userFeeds = feeds.filter((feed) => feed.userId === userId);
+    return HttpResponse.json(userFeeds);
+  }),
+
+  // 특정 태그의 피드 조회 GET
+  http.get("/api/feed/posts/hashtags/:tag", ({ params }) => {
+    const { tag } = params;
+    const tagFeeds = feeds.filter((feed) => feed.tags.includes(tag));
+    return HttpResponse.json(tagFeeds);
   }),
 ];

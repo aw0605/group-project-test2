@@ -1,19 +1,28 @@
 import React, { FC, useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import axios from "axios";
 import { BsHeart, BsHeartFill } from "react-icons/bs";
-import { Heart } from "../../types/feedType";
 import HeartsModal from "./HeartsModal";
+import { toggleLike } from "../../redux/slice/heartSlice";
+import { AppDispatch, RootState } from "../../redux/store/store";
 
 interface FeedHeartsProps {
   heartCount: number;
   postId: string;
 }
 
-const FeedHearts: FC<FeedHeartsProps> = ({ heartCount, postId }) => {
+const FeedHearts: FC<FeedHeartsProps> = ({
+  heartCount: initialHeartCount,
+  postId,
+}) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const heartCount =
+    useSelector((state: RootState) => state.likes[postId]) || initialHeartCount;
   const [isHeart, setIsHeart] = useState(false);
-  const [heartUsers, setHeartUsers] = useState([]);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [heartUsers, setHeartUsers] = useState([]);
 
   const fetchHeartUsers = async () => {
     try {
@@ -22,6 +31,17 @@ const FeedHearts: FC<FeedHeartsProps> = ({ heartCount, postId }) => {
     } catch (error) {
       console.error("Error fetching hearts:", error);
     }
+  };
+
+  useEffect(() => {
+    setIsHeart(heartCount > initialHeartCount);
+  }, [heartCount, initialHeartCount]);
+
+  const handleLike = async () => {
+    await dispatch(toggleLike({ postId, isLiked: isHeart }));
+    setIsHeart(!isHeart); // 좋아요 상태 토글
+    fetchHeartUsers(); // 모달에 표시될 유저 목록 다시 불러오기
+    console.log(heartCount);
   };
 
   const openModal = () => {
@@ -39,9 +59,8 @@ const FeedHearts: FC<FeedHeartsProps> = ({ heartCount, postId }) => {
 
   return (
     <HeartContainer>
-      <HeartButton>
-        <BsHeart />
-        {/* <BsHeartFill /> */}
+      <HeartButton onClick={handleLike}>
+        {isHeart ? <StyledHeartFill /> : <BsHeart />}
       </HeartButton>
 
       {heartCount > 0 ? (
@@ -51,6 +70,7 @@ const FeedHearts: FC<FeedHeartsProps> = ({ heartCount, postId }) => {
       ) : (
         <p>좋아요</p>
       )}
+
       {isModalOpen && (
         <HeartsModal heartUsers={heartUsers} onClose={closeModal} />
       )}
@@ -74,6 +94,14 @@ const HeartButton = styled.button`
   padding: 0;
   font-size: 20px;
   display: flex;
+  :hover {
+    opacity: 0.6;
+    transition: all 0.1s ease-in-out;
+  }
+`;
+
+const StyledHeartFill = styled(BsHeartFill)`
+  color: #5d6dbe;
 `;
 
 const HeartsModalButton = styled.button`

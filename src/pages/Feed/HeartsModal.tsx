@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from "react";
+import React, { FC } from "react";
 import styled from "styled-components";
 import ModalPortal from "../../components/ModalPortal";
 import { User } from "../../types/feedType";

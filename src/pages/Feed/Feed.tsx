@@ -34,7 +34,7 @@ const RightWrap = styled.div`
   display: flex;
   flex-direction: column;
   margin: 0 auto;
-  padding-top: 20px;
+  padding: 20px 0 30px;
   /* padding-left: 15%; */
   background-color: #ededed;
 `;

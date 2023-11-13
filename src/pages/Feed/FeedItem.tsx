@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 import styled from "styled-components";
 import FeedTop from "./FeedTop";
 import FeedSlider from "./FeedSlider";
@@ -10,6 +10,20 @@ interface FeedItemProps {
 }
 
 const FeedItem: FC<FeedItemProps> = ({ post }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const combinedTextLength =
+    post.text.length + post.tags.reduce((acc, tag) => acc + tag.length + 1, 0);
+  const showMoreButton = combinedTextLength > 20 || post.text.includes("\n");
+  const displayText =
+    isExpanded || !showMoreButton
+      ? post.text
+      : `${post.text.substring(0, 20)}...`;
+
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+
   return (
     <div>
       <FeedContainer>
@@ -25,16 +39,20 @@ const FeedItem: FC<FeedItemProps> = ({ post }) => {
           <FeedHearts heartCount={post.heartCount} postId={post.postId} />
           <FeedBottom>
             <div className="feed-text">
-              <span>{post.text}</span>
-              <div className="feed-tags">
-                <span>
-                  {post.tags.map((tag) => (
-                    <a>{tag}</a>
+              <p>{displayText}</p>
+              {isExpanded && (
+                <div className="feed-tags">
+                  {post.tags.map((tag, index) => (
+                    <Tag key={index}>{tag}</Tag>
                   ))}
-                </span>
-              </div>
+                </div>
+              )}
             </div>
-            <span>더보기</span>
+            {showMoreButton && (
+              <MoreButton onClick={toggleExpand}>
+                {isExpanded ? "접기" : "더보기"}
+              </MoreButton>
+            )}
           </FeedBottom>
         </FeedContent>
       </FeedContainer>
@@ -64,11 +82,21 @@ const FeedBottom = styled.div`
   align-items: start;
   .feed-text {
     display: inline-block;
-    width: 500px;
-    height: 16px;
     text-align: left;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
+    margin-bottom: 10px;
   }
+  .feed-tags {
+    margin-top: 10px;
+  }
+`;
+
+const Tag = styled.a`
+  color: #5d6dbe;
+  margin-right: 7px;
+  cursor: pointer;
+`;
+
+const MoreButton = styled.span`
+  color: #7e7e7e;
+  cursor: pointer;
 `;
