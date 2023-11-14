@@ -1,4 +1,5 @@
 import React, { FC, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import FeedTop from "./FeedTop";
 import FeedSlider from "./FeedSlider";
@@ -10,6 +11,8 @@ interface FeedItemProps {
 }
 
 const FeedItem: FC<FeedItemProps> = ({ post }) => {
+  const navigate = useNavigate();
+
   const [isExpanded, setIsExpanded] = useState(false);
 
   const combinedTextLength =
@@ -22,6 +25,11 @@ const FeedItem: FC<FeedItemProps> = ({ post }) => {
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
+  };
+
+  const handleTagClick = (tag: string) => {
+    const formattedTag = tag.replace("#", "");
+    navigate(`/feed/hashtags/${encodeURIComponent(formattedTag)}`);
   };
 
   return (
@@ -43,7 +51,9 @@ const FeedItem: FC<FeedItemProps> = ({ post }) => {
               {isExpanded && (
                 <div className="feed-tags">
                   {post.tags.map((tag, index) => (
-                    <Tag key={index}>{tag}</Tag>
+                    <Tag key={index} onClick={() => handleTagClick(tag)}>
+                      {tag}
+                    </Tag>
                   ))}
                 </div>
               )}

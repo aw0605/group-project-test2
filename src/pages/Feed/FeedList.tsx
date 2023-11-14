@@ -3,18 +3,18 @@ import axios from "axios";
 import FeedItem from "./FeedItem";
 import { Feed } from "../../types/feedType";
 
-const FeedList: FC = () => {
-  const [posts, setPosts] = useState<Feed[]>([]);
+const FeedList: FC<{ posts: Feed[] }> = ({ posts }) => {
+  // const [posts, setPosts] = useState<Feed[]>([]);
 
-  useEffect(() => {
-    axios
-      .get("/api/feed/posts")
-      .then((response) => {
-        setPosts(response.data);
-        console.log(response.data);
-      })
-      .catch((error) => console.error(error));
-  }, []);
+  // useEffect(() => {
+  //   axios
+  //     .get("/api/feed/posts")
+  //     .then((response) => {
+  //       setPosts(response.data);
+  //       console.log(response.data);
+  //     })
+  //     .catch((error) => console.error(error));
+  // }, []);
 
   return (
     <div>

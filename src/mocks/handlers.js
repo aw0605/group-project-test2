@@ -1100,7 +1100,6 @@ export const handlers = [
       userId: currentUser.userId,
     });
 
-    // return HttpResponse.json(heartsEntry, { status: 201 });
     return HttpResponse.json({
       heartCount: feed.heartCount,
       userList: heartsEntry.userList,
@@ -1138,13 +1137,14 @@ export const handlers = [
   http.get("/api/feed/posts/:userId", ({ params }) => {
     const { userId } = params;
     const userFeeds = feeds.filter((feed) => feed.userId === userId);
-    return HttpResponse.json(userFeeds);
+    const userImg = userFeeds.length > 0 ? userFeeds[0].userImg : null;
+    return HttpResponse.json({ userFeeds, userImg });
   }),
 
   // 특정 태그의 피드 조회 GET
   http.get("/api/feed/posts/hashtags/:tag", ({ params }) => {
     const { tag } = params;
-    const tagFeeds = feeds.filter((feed) => feed.tags.includes(tag));
+    const tagFeeds = feeds.filter((feed) => feed.tags.includes(`#${tag}`));
     return HttpResponse.json(tagFeeds);
   }),
 ];

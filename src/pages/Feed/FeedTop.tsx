@@ -1,4 +1,5 @@
 import React, { FC } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { formatDate } from "../../utils/dateUtil";
 
@@ -17,12 +18,22 @@ const FeedTop: FC<FeedTopProps> = ({
   location,
   temperature,
 }) => {
+  const navigate = useNavigate();
+
+  const handleUserClick = () => {
+    navigate(`/feed/${userId}`);
+  };
+
   return (
     <div>
       <FirstTop>
         <UserContainer>
-          <img src={userImg} alt={`${userId} 프로필 이미지`} />
-          <p>{userId}</p>
+          <img
+            src={userImg}
+            alt={`${userId} 프로필 이미지`}
+            onClick={handleUserClick}
+          />
+          <p onClick={handleUserClick}>{userId}</p>
         </UserContainer>
         <p>{formatDate(date)}</p>
       </FirstTop>
@@ -53,11 +64,13 @@ const UserContainer = styled.div`
     border-radius: 40px;
     object-fit: cover;
     margin-right: 10px;
+    cursor: pointer;
   }
   p {
     color: #000;
     font-size: 1rem;
     font-weight: bold;
+    cursor: pointer;
   }
   ::after {
     content: "•";
