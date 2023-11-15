@@ -4,32 +4,59 @@ import axios from "axios";
 import styled from "styled-components";
 import Nav from "../../components/nav/Nav";
 import FeedList from "./FeedList";
+import { useInfiniteFeedQuery } from "../../hooks/useInfiniteQuery";
+import { useIntersectionObserver } from "../../hooks/useIntersectionObserver";
 
 const Feed: FC = () => {
   const { userId, tag } = useParams<{ userId?: string; tag?: string }>();
-  const [posts, setPosts] = useState([]);
-  const [userImg, setUserImg] = useState("");
+  // const [posts, setPosts] = useState([]);
+  // const [userImg, setUserImg] = useState("");
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      let endpoint = "/api/feed/posts";
-      if (userId) {
-        endpoint = `/api/feed/posts/${userId}`;
-      } else if (tag) {
-        endpoint = `/api/feed/posts/hashtags/${tag}`;
-      }
-      const response = await axios.get(endpoint);
+  // useEffect(() => {
+  //   const fetchPosts = async () => {
+  //     let endpoint = "/api/feed/posts";
+  //     if (userId) {
+  //       endpoint = `/api/feed/posts/${userId}`;
+  //     } else if (tag) {
+  //       endpoint = `/api/feed/posts/hashtags/${tag}`;
+  //     }
+  //     const response = await axios.get(endpoint);
 
-      if (userId) {
-        setUserImg(response.data.userImg);
-        setPosts(response.data.userFeeds);
-      } else {
-        setPosts(response.data);
-      }
-    };
+  //     if (userId) {
+  //       setUserImg(response.data.userImg);
+  //       setPosts(response.data.userFeeds);
+  //     } else {
+  //       setPosts(response.data);
+  //     }
+  //   };
 
-    fetchPosts();
-  }, [userId, tag]);
+  //   fetchPosts();
+  // }, [userId, tag]);
+
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isError,
+    error,
+  } = useInfiniteFeedQuery(userId ?? "", tag ?? "");
+
+  const loadMoreRef = useIntersectionObserver(
+    () => {
+      if (hasNextPage) fetchNextPage();
+    },
+    {
+      threshold: 0.1, // 10%가 보이면 다음 페이지 로드
+    }
+  );
+
+  const userImg = data?.pages[0]?.userFeeds[0]?.userImg ?? "";
+
+  // 에러 처리
+  if (isError) {
+    return <div>An error has occurred: {error?.message}</div>;
+  }
 
   return (
     <Container>
@@ -43,7 +70,17 @@ const Feed: FC = () => {
         )}
         {tag && <Tag>#{tag}</Tag>}
         <div>
-          <FeedList posts={posts} />
+          {/* <FeedList posts={posts} /> */}
+          <FeedList
+            posts={data?.pages.map((page) => page.feeds).flat() ?? []}
+          />
+          <div ref={loadMoreRef}>
+            {isFetchingNextPage
+              ? "Loading more..."
+              : hasNextPage
+              ? "Load More"
+              : "Nothing more to load"}
+          </div>
         </div>
       </RightWrap>
     </Container>
