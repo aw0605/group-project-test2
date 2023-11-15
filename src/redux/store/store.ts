@@ -1,7 +1,9 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import loginSlice from "../slice/loginSlice";
 import heartReducer from "../slice/heartSlice";
 
 const rootReducer = combineReducers({
+  login: loginSlice,
   likes: heartReducer,
 });
 

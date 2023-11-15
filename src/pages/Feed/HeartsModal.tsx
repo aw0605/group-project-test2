@@ -27,7 +27,7 @@ const HeartsModal: FC<HeartsModalProps> = ({ heartUsers, onClose }) => {
         <UserList>
           {heartUsers.map((user, index) => (
             <UserItem key={index}>
-              <a href="" onClick={() => handleUserClick(user.userId)}>
+              <div onClick={() => handleUserClick(user.userId)}>
                 <UserInfo>
                   <img
                     src={user.userImg}
@@ -36,7 +36,7 @@ const HeartsModal: FC<HeartsModalProps> = ({ heartUsers, onClose }) => {
                   <p>{user.userId}</p>
                 </UserInfo>
                 <StyledBsArrowRightSquareFill />
-              </a>
+              </div>
             </UserItem>
           ))}
         </UserList>
@@ -52,7 +52,6 @@ const ModalContent = styled.div`
   height: 310px;
   border-radius: 10px;
   background-color: #fff;
-  border-radius: 10px;
   display: flex;
   flex-direction: column;
 `;
@@ -93,11 +92,12 @@ const UserItem = styled.div`
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  a {
+  > div {
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    cursor: pointer;
   }
 `;
 

@@ -14,7 +14,7 @@ interface ImgsProps {
 const FeedSlider: FC<ImgsProps> = ({ imgs }) => {
   const isVideo = (url: string) => {
     return url.includes(
-      ".mp4" || ".avi" || ".avi" || ".wmv" || ".asf" || ".mkv" || ".mov"
+      ".mp4" || ".avi" || ".wmv" || ".asf" || ".mkv" || ".mov"
     );
   };
 

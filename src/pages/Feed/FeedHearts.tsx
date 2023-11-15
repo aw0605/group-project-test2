@@ -2,10 +2,11 @@ import React, { FC, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import axios from "axios";
-import { BsHeart, BsHeartFill } from "react-icons/bs";
-import HeartsModal from "./HeartsModal";
 import { toggleLike } from "../../redux/slice/heartSlice";
 import { AppDispatch, RootState } from "../../redux/store/store";
+import { BsHeart, BsHeartFill } from "react-icons/bs";
+import ErrorModal from "./ErrorModal";
+import HeartsModal from "./HeartsModal";
 
 interface FeedHeartsProps {
   heartCount: number;
@@ -21,7 +22,11 @@ const FeedHearts: FC<FeedHeartsProps> = ({
     useSelector((state: RootState) => state.likes[postId]) || initialHeartCount;
   const [isHeart, setIsHeart] = useState(false);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const isLoggedIn = useSelector((state: RootState) => state.login.isLoggedIn); // 로그인 상태 확인
+
+  const [showErrorModal, setShowErrorModal] = useState(false); // 에러 모달 상태
+  const [showHeartsModal, setShowHeartsModal] = useState(false);
+
   const [heartUsers, setHeartUsers] = useState([]);
 
   const fetchHeartUsers = async () => {
@@ -37,7 +42,20 @@ const FeedHearts: FC<FeedHeartsProps> = ({
     setIsHeart(heartCount > initialHeartCount);
   }, [heartCount, initialHeartCount]);
 
+  // const handleLike = async () => {
+  //   await dispatch(toggleLike({ postId, isLiked: isHeart }));
+  //   setIsHeart(!isHeart); // 좋아요 상태 토글
+  //   fetchHeartUsers(); // 모달에 표시될 유저 목록 다시 불러오기
+  //   console.log(heartCount);
+  // };
+
   const handleLike = async () => {
+    if (!isLoggedIn) {
+      document.body.style.overflowY = "hidden";
+      setShowErrorModal(true); // 로그인되지 않은 경우 에러 모달 표시
+      return; // 함수 실행 중단
+    }
+
     await dispatch(toggleLike({ postId, isLiked: isHeart }));
     setIsHeart(!isHeart); // 좋아요 상태 토글
     fetchHeartUsers(); // 모달에 표시될 유저 목록 다시 불러오기
@@ -48,13 +66,17 @@ const FeedHearts: FC<FeedHeartsProps> = ({
     if (heartCount > 0) {
       document.body.style.overflowY = "hidden";
       fetchHeartUsers();
-      setIsModalOpen(true);
+      setShowHeartsModal(true);
     }
   };
 
-  const closeModal = () => {
+  const closeModal = (modalType: string) => {
     document.body.style.overflowY = "auto";
-    setIsModalOpen(false);
+    if (modalType === "error") {
+      setShowErrorModal(false);
+    } else if (modalType === "hearts") {
+      setShowHeartsModal(false);
+    }
   };
 
   return (
@@ -71,8 +93,12 @@ const FeedHearts: FC<FeedHeartsProps> = ({
         <p>좋아요</p>
       )}
 
-      {isModalOpen && (
-        <HeartsModal heartUsers={heartUsers} onClose={closeModal} />
+      {showErrorModal && <ErrorModal onClose={() => closeModal("error")} />}
+      {showHeartsModal && (
+        <HeartsModal
+          heartUsers={heartUsers}
+          onClose={() => closeModal("hearts")}
+        />
       )}
     </HeartContainer>
   );
