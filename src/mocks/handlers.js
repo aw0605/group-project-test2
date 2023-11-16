@@ -1063,7 +1063,7 @@ const heartsData = [
 ];
 
 export const handlers = [
-  // 전체 피드 GET
+  // 전체 피드 조회 GET
   http.get("/api/feed/posts", () => {
     return HttpResponse.json(feeds);
   }),
