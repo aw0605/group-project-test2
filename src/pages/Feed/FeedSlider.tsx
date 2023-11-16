@@ -21,7 +21,7 @@ const FeedSlider: FC<ImgsProps> = ({ imgs }) => {
   return (
     <>
       <StyledSwiper
-        spaceBetween={10}
+        spaceBetween={0}
         slidesPerView={1}
         pagination={{ clickable: true }}
         navigation={true}

@@ -15,6 +15,10 @@ const FeedItem: FC<FeedItemProps> = ({ post }) => {
 
   const [isExpanded, setIsExpanded] = useState(false);
 
+  if (!post) {
+    return null; // or some placeholder component
+  }
+
   const combinedTextLength =
     post.text.length + post.tags.reduce((acc, tag) => acc + tag.length + 1, 0);
   const showMoreButton = combinedTextLength > 20 || post.text.includes("\n");

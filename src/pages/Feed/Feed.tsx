@@ -1,62 +1,35 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import styled from "styled-components";
 import Nav from "../../components/nav/Nav";
 import FeedList from "./FeedList";
-import { useInfiniteFeedQuery } from "../../hooks/useInfiniteQuery";
-import { useIntersectionObserver } from "../../hooks/useIntersectionObserver";
+import { useInfinite } from "../../hooks/useInfinite";
+import useIntersect from "../../hooks/useIntersect";
 
 const Feed: FC = () => {
   const { userId, tag } = useParams<{ userId?: string; tag?: string }>();
-  // const [posts, setPosts] = useState([]);
-  // const [userImg, setUserImg] = useState("");
 
-  // useEffect(() => {
-  //   const fetchPosts = async () => {
-  //     let endpoint = "/api/feed/posts";
-  //     if (userId) {
-  //       endpoint = `/api/feed/posts/${userId}`;
-  //     } else if (tag) {
-  //       endpoint = `/api/feed/posts/hashtags/${tag}`;
-  //     }
-  //     const response = await axios.get(endpoint);
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfinite({
+    userId,
+    tag,
+  });
 
-  //     if (userId) {
-  //       setUserImg(response.data.userImg);
-  //       setPosts(response.data.userFeeds);
-  //     } else {
-  //       setPosts(response.data);
-  //     }
-  //   };
-
-  //   fetchPosts();
-  // }, [userId, tag]);
-
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isError,
-    error,
-  } = useInfiniteFeedQuery(userId ?? "", tag ?? "");
-
-  const loadMoreRef = useIntersectionObserver(
-    () => {
-      if (hasNextPage) fetchNextPage();
-    },
-    {
-      threshold: 0.1, // 10%가 보이면 다음 페이지 로드
+  const ref = useIntersect((entry, observer) => {
+    if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
     }
-  );
+  });
 
-  const userImg = data?.pages[0]?.userFeeds[0]?.userImg ?? "";
+  // const posts = useMemo(
+  //   () => (data ? data.pages.flatMap((page) => page).flat() : []),
+  //   [data]
+  // );
 
-  // 에러 처리
-  if (isError) {
-    return <div>An error has occurred: {error?.message}</div>;
-  }
+  const posts = data?.pages.flatMap((page) => page).flat() || [];
+  const userImg = data?.pages?.[0]?.[0]?.userImg ?? "";
+
+  console.log(data?.pages);
 
   return (
     <Container>
@@ -70,17 +43,13 @@ const Feed: FC = () => {
         )}
         {tag && <Tag>#{tag}</Tag>}
         <div>
-          {/* <FeedList posts={posts} /> */}
-          <FeedList
-            posts={data?.pages.map((page) => page.feeds).flat() ?? []}
-          />
-          <div ref={loadMoreRef}>
-            {isFetchingNextPage
-              ? "Loading more..."
-              : hasNextPage
-              ? "Load More"
-              : "Nothing more to load"}
-          </div>
+          <FeedList posts={posts} />
+          {isFetchingNextPage ? (
+            <p>로딩중...</p>
+          ) : !hasNextPage ? (
+            <p>게시물이 더 이상 존재하지 않습니다.</p>
+          ) : null}
+          <div ref={ref} />
         </div>
       </RightWrap>
     </Container>

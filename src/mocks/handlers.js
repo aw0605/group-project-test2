@@ -1062,37 +1062,18 @@ const heartsData = [
   },
 ];
 
-const PAGE_SIZE = 10; // The number of posts per page 무한스킄롤 적용 위한 내용 --------------------------------------------
-
-// Function to slice the feeds array for pagination
-const paginateFeeds = (feeds, page) => {
-  const start = page * PAGE_SIZE;
-  const end = start + PAGE_SIZE;
-  const paginatedFeeds = feeds.slice(start, end);
-  return {
-    paginatedFeeds,
-    nextPage: end < feeds.length ? page + 1 : null,
-  };
-}; // The number of posts per page 무한스킄롤 적용 위한 내용 --------------------------------------------
+const paginateData = (data, page, size) => {
+  return data.slice(page * size, (page + 1) * size);
+};
 
 export const handlers = [
-  // // 전체 피드 GET
-  // http.get("/api/feed/posts", () => {
-  //   return HttpResponse.json(feeds);
-  // }),
   // 무한스클롤 적용 전체 피드 GET API
-  http.get("/api/feed/posts", (req) => {
-    console.log("Request object:", req);
-    console.log("URL object:", req.url);
-    console.log("Search params:", req.url.searchParams);
-    const url = new URL(req.url);
-    const pageParam = url.searchParams.get("page");
-    const page = pageParam ? parseInt(pageParam, 10) : 0;
-    const { paginatedFeeds, nextPage } = paginateFeeds(feeds, page);
-    return HttpResponse.json({
-      feeds: paginatedFeeds,
-      nextPage,
-    });
+  http.get("/api/feed/posts", ({ request }) => {
+    const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get("page") || "0", 10);
+    const size = parseInt(url.searchParams.get("size") || "10", 10);
+    const paginatedFeeds = paginateData(feeds, page, size);
+    return HttpResponse.json(paginatedFeeds);
   }),
 
   // 해당 피드에 좋아요 누른 유저목록 GET
@@ -1100,7 +1081,7 @@ export const handlers = [
     const { postId } = params;
     const heartsEntry = heartsData.find((entry) => entry.postId === postId);
     if (!heartsEntry) {
-      return HttpResponse.error("Post not found", { status: 404 });
+      return HttpResponse.error();
     }
     return HttpResponse.json(heartsEntry);
   }),
@@ -1111,7 +1092,7 @@ export const handlers = [
 
     const feed = feeds.find((f) => f.postId === postId);
     if (!feed) {
-      return HttpResponse.error("Post not found", { status: 404 });
+      return HttpResponse.error();
     }
     feed.heartCount += 1;
 
@@ -1139,9 +1120,8 @@ export const handlers = [
 
     const feed = feeds.find((f) => f.postId === postId);
     if (!feed) {
-      return HttpResponse.error("Post not found", { status: 404 });
+      return HttpResponse.error();
     }
-
     if (feed.heartCount > 0) {
       feed.heartCount -= 1;
     }
@@ -1160,44 +1140,26 @@ export const handlers = [
     });
   }),
 
-  // // 특정 유저의 피드 조회 GET
-  // http.get("/api/feed/posts/:userId", ({ params }) => {
-  //   const { userId } = params;
-  //   const userFeeds = feeds.filter((feed) => feed.userId === userId);
-  //   const userImg = userFeeds.length > 0 ? userFeeds[0].userImg : null;
-  //   return HttpResponse.json({ userFeeds, userImg });
-  // }),
   //무한스크롤 적용 특정 유저의 피드 조회 GET API
-  http.get("/api/feed/posts/:userId", ({ params }) => {
+  http.get("/api/feed/posts/:userId", ({ params, request }) => {
     const { userId } = params;
-    const pageParam = params.url.searchParams.get("page");
-    const page = pageParam ? parseInt(pageParam, 10) : 0;
+    const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get("page") || "0", 10);
+    const size = parseInt(url.searchParams.get("size") || "10", 10);
     const userFeeds = feeds.filter((feed) => feed.userId === userId);
+    const paginatedUserFeeds = paginateData(userFeeds, page, size);
     const userImg = userFeeds.length > 0 ? userFeeds[0].userImg : null;
-    const { paginatedFeeds, nextPage } = paginateFeeds(userFeeds, page);
-    return HttpResponse.json({
-      userFeeds: paginatedFeeds,
-      nextPage,
-      userImg,
-    });
+    return HttpResponse.json({ userFeeds: paginatedUserFeeds, userImg });
   }),
 
-  // // 특정 태그의 피드 조회 GET
-  // http.get("/api/feed/posts/hashtags/:tag", ({ params }) => {
-  //   const { tag } = params;
-  //   const tagFeeds = feeds.filter((feed) => feed.tags.includes(`#${tag}`));
-  //   return HttpResponse.json(tagFeeds);
-  // }),
   // 무한스크롤 적용 특정 태그의 피드 조회 GET API
-  http.get("/api/feed/posts/hashtags/:tag", (req) => {
-    const { tag } = req.params;
-    const pageParam = req.url.searchParams.get("page");
-    const page = pageParam ? parseInt(pageParam, 10) : 0;
+  http.get("/api/feed/posts/hashtags/:tag", ({ params, request }) => {
+    const { tag } = params;
+    const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get("page") || "0", 10);
+    const size = parseInt(url.searchParams.get("size") || "10", 10);
     const tagFeeds = feeds.filter((feed) => feed.tags.includes(`#${tag}`));
-    const { paginatedFeeds, nextPage } = paginateFeeds(tagFeeds, page);
-    return HttpResponse.json({
-      tagFeeds: paginatedFeeds,
-      nextPage,
-    });
+    const paginatedTagFeeds = paginateData(tagFeeds, page, size);
+    return HttpResponse.json(paginatedTagFeeds);
   }),
 ];
